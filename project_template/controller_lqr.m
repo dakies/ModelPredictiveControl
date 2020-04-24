@@ -15,7 +15,8 @@ if isempty(param)
 end
 
 % compute control action
- p = LQR(param.A, param.B, param.Q, param.R, 0);
+ k_lqr= lqr(param.A, param.B, param.Q, param.R, 0);
+ p = k_lqr * T;
 end
 
 function param = init()

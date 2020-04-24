@@ -44,8 +44,8 @@ function param = compute_controller_base_parameters
     Xcons = [Tcons(1,2); Tcons(2,2); -Tcons(2,1);] - Gx * T_sp;
     
     % (5) LQR cost function
-    Q = 0
-    R = 0
+    Q = eye(3);
+    R = eye(2);
     
     % put everything together
     param.A = A;
