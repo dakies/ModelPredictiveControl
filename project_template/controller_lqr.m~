@@ -16,7 +16,7 @@ end
 
 % compute control action
  k_lqr = dlqr(param.A, param.B, param.Q, param.R, 0);
- p = k_lqr * T;
+ p = -k_lqr * T;
 end
 
 function param = init()

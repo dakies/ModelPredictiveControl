@@ -19,18 +19,19 @@ function param = compute_controller_base_parameters
     A = expm(A_cont*Ts);
     
     %Stimmt folgendes?????
-    B = A_cont'*(A-eye(size(A_cont)))*B_cont;
-    B_d = B_d_cont;
+    B = A_cont\(A-eye(size(A_cont)))*B_cont;
+    %B_d = B_d_cont;
+    B_d = A_cont\(A-eye(size(A_cont)))*B_d_cont;
  
     
     %Lec7 Slide30
-    temp = [A-eye(size(A)) B;...
+    tempor = [A-eye(size(A)) B;...
         truck.C_ref zeros(2,2)];
     
     %Check for full Rank
-    assert(det(temp) ~= 0);
+    assert(det(tempor) ~= 0);
     
-    xu = temp\[-B_d*d; truck.b_ref];
+    xu = tempor\[-B_d*d; truck.b_ref];
     
     %% (3) set point computation
     T_sp = xu(1:3);
@@ -48,7 +49,7 @@ function param = compute_controller_base_parameters
     Xcons = [Tcons(1,2); Tcons(2,2); -Tcons(2,1);] - Gx * T_sp;
     
     %% (5) LQR cost function
-    Q = 10*eye(3);
+    Q = diag([1;1;0.1]);
     R = eye(2);
     
     %% put everything together
