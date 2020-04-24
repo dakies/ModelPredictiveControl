@@ -1,5 +1,5 @@
 function param = compute_controller_base_parameters
-    % load truck parameters
+    %% load truck parameters
     load('system/parameters_truck');
     
     A_cont = [(truck.a12-truck.a1o)/truck.m1 truck.a12/truck.m1 0;...
@@ -14,7 +14,7 @@ function param = compute_controller_base_parameters
     B_d_cont = diag([1/truck.m1 1/truck.m2 1/truck.m3]);
     
     
-    % (2) discretization
+    %% (2) discretization
     Ts = 60;
     A = expm(A_cont*Ts);
     
@@ -27,27 +27,31 @@ function param = compute_controller_base_parameters
     temp = [A-eye(size(A)) B;...
         truck.C_ref zeros(2,2)];
     
+    %Check for full Rank
+    assert(det(temp) ~= 0);
+    
     xu = temp\[-B_d*d; truck.b_ref];
-    % (3) set point computation
+    
+    %% (3) set point computation
     T_sp = xu(1:3);
     p_sp = xu(4:5);
     
-    % (4) system constraints
+    %% (4) system constraints
     Pcons = truck.InputConstraints;
     Tcons = truck.StateConstraints;
     
-    % (4) constraints for delta formulation
+    %% (4) constraints for delta formulation
     Gu = [1 0; -1 0; 1 0; -1 0];
     Ucons = [Pcons(1,2); -Pcons(1,1); Pcons(2,2); -Pcons(2,1)] - Gu*p_sp;
     
     Gx = [1 0 0; 0 1 0; 0 -1 0];
     Xcons = [Tcons(1,2); Tcons(2,2); -Tcons(2,1);] - Gx * T_sp;
     
-    % (5) LQR cost function
-    Q = eye(3);
+    %% (5) LQR cost function
+    Q = 10*eye(3);
     R = eye(2);
     
-    % put everything together
+    %% put everything together
     param.A = A;
     param.B = B;
     param.Q = Q;
