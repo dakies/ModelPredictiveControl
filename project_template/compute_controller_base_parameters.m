@@ -8,10 +8,10 @@ function param = compute_controller_base_parameters
     
     B_cont = [1 0;...
         0 1;...
-        0 0];
+        0 0]; %Input Matrix
     
     d = truck.w + [truck.a1o*truck.To; truck.a2o*truck.To; truck.a3o*truck.To];
-    B_d_cont = diag([1/truck.m1 1/truck.m2 1/truck.m3]);
+    B_d_cont = diag([1/truck.m1 1/truck.m2 1/truck.m3]); %Disturbance, mit Ts discretiziert --> keine Umrechnung nötig, jedoch ist Jon sich nicht sicher
     
     
     %% (2) discretization
@@ -31,11 +31,11 @@ function param = compute_controller_base_parameters
     %Check for full Rank
     assert(det(tempor) ~= 0);
     
-    xu = tempor\[-B_d*d; truck.b_ref];
+    xu = tempor\[-B_d*Ts*d; truck.b_ref]; %hinzufügen von Ts und B_d_cont (Jon empfehlung) JP eigentlich nur B_d
     
     %% (3) set point computation
     T_sp = xu(1:3);
-    p_sp = xu(4:5);
+    p_sp = [-1927.5;-976.5]; %xu(4:5);
     
     %% (4) system constraints
     Pcons = truck.InputConstraints;
@@ -49,8 +49,8 @@ function param = compute_controller_base_parameters
     Xcons = [Tcons(1,2); Tcons(2,2); -Tcons(2,1);] - Gx * T_sp;
     
     %% (5) LQR cost function
-    Q = diag([1;1;0.1]);
-    R = eye(2);
+    Q = diag([1000;1000;1]);
+    R = diag([0.1,0.1]);
     
     %% put everything together
     param.A = A;
