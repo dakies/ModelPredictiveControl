@@ -15,10 +15,12 @@ if isempty(param)
 end
 
 % compute control action
- x = T - param.T_sp; %T_sp muss abgezogen werden, da der LQR auf 0 regelt
- k_lqr = -dlqr(param.A, param.B, param.Q, param.R,0); %definitiv Minus K - kommt von der Dokumentation 
- u = k_lqr * x;
- p = u + param.p_sp; %Fügen unseren Steady State point hinzu
+%Lec7 Slide19
+% u = u_sp -K(x-x_sp), so that u = u_sp when x = x_sp (kept in equilibrium)
+ k_lqr = dlqr(param.A, param.B, param.Q, param.R,0); %definitiv Minus K - kommt von der Dokumentation 
+ x = T - param.T_sp; %T_sp muss abgezogen werden
+ u = -k_lqr * x;
+ p = u + param.p_sp; %Fï¿½gen unseren Steady State point hinzu
 end
 
 function param = init()
