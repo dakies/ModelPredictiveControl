@@ -10,14 +10,15 @@ function [A_x, b_x] = compute_X_LQR
     
     % computes a control invariant set for LTI system x^+ = A*x+B*u
     
-    %Problem: teilweise Werte für delta_x und teilweise für x
+    %Problem: Konvergiert immernoch nicht
+    %Ideen: Teilweise Werte für delta_x und teilweise für x
     
-    k_lqr = dlqr(param.A, param.B, param.Q, param.R,0);
+    k_lqr = dlqr(param.A, param.B, param.Q, param.R);
    
     %System
     A = param.A;
     B = param.B;
-    system = LTISystem('A', A-B*k_lqr);
+    system = LTISystem('A', A, 'B', B);
     
 %     Gx = [1 0 0; 0 1 0; 0 -1 0];
 %     Gu = [1 0; -1 0; 1 0; -1 0];
@@ -31,11 +32,11 @@ function [A_x, b_x] = compute_X_LQR
 %     system.x.reference = param.T_sp;
 %     system.u.reference = param.p_sp;
 %     
-%     %LQR
-%     Q = diag([10;10;1]);
-%     system.x.penalty = QuadFunction(Q);
-%     R = diag([0.1,0.1]);
-%     system.u.penalty = QuadFunction(R);
+    %LQR
+    Q = param.Q;
+    system.x.penalty = QuadFunction(Q);
+    R = param.R;
+    system.u.penalty = QuadFunction(R);
 %     
 %      
 %     system.x.min = [param.Tcons(1, 1); param.Tcons(2, 1); param.Tcons(3, 1)];
@@ -46,17 +47,18 @@ function [A_x, b_x] = compute_X_LQR
 % %     Sanity checks
 %     display(system.LQRGain())
     
-%     system.x.min = [-Inf; param.Xcons(3); -Inf];
-%     system.x.max = [param.Xcons(1); param.Xcons(2); Inf];
+    system.x.min = [-Inf; param.Xcons(3); -Inf];
+    system.x.max = [param.Xcons(1); param.Xcons(2); Inf];
 %     system.u.min = [param.Ucons(2); param.Ucons(4)];
 %     system.u.max = [param.Ucons(1); param.Ucons(3)];
 
-%     InvSet = system.invariantSet('maxIterations', 100)
-%     InvSet.plot()
+%     Set = system.invariantSet('maxIterations', 100)
+%     Set.plot()
 
-    S = system.LQRSet()
+    Set = system.LQRSet()
+    Set.plot()
     
-    A_x = S.A;
-    b_x = S.b;
+    A_x = Set.A;
+    b_x = Set.b;
 end
 
