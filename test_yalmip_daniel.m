@@ -36,7 +36,7 @@ objective = objective + (C*x{N+1}-r{N+1})'*(C*x{N+1}-r{N+1});
 parameters_in = {x{1},[r{:}],d,pastu,B};
 solutions_out = {[u{:}], [x{:}]};
 
-controller = optimizer(constraints, objective,sdpsettings('solver','gurobi'),parameters_in,solutions_out);
+controller = optimizer(constraints, objective,sdpsettings('solver','gurobi'),parameters_in, solutions_out);
 x = [0;0];
 clf;
 disturbance = randn(1)*.01;

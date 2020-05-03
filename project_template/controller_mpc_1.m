@@ -110,6 +110,8 @@ nx = size(param.A,1);
 nu = size(param.B,2);
 
 %Initial State
+dev = [3; 1; 0];
+T0_1 = dev + [-21; 0.3; 7.32];
 x0 =[];
 
 u = sdpvar(repmat(nu,1,N-1), repmat(1,1,N-1), 'full');
@@ -118,11 +120,10 @@ x = sdpvar(repmat(nx,1,N), repmat(1,1,N), 'full');
 objective = 0;
 Gu = [1 0; -1 0; 1 0; -1 0];
 Gx = [1 0 0; 0 1 0; 0 -1 0];
-constraints = [param.Tcons(:,1) <= eye(3)*x{1} <= param.Tcons(:,2)];
 
 for k = 1:N-1
   constraints = [constraints, param.Pcons(:,1) <= eye(2)*u{k} <= param.Pcons(:,2)];
-  constraints = [constraints, param.Tcons(:,1) <= eye(3)*x{k} <= param.Tcons(:,2)];
+  constraints = [constraints, param.Tcons(:,1) <= eye(3)*x{k+1} <= param.Tcons(:,2)];
   constraints = [constraints, x{k+1} == A*x{k}+B*u{k}];
   objective = objective + norm(Q*(x{k}-param.T_sp), 1) + norm(R*(u{k}-param.p_sp), 1) ;
 end

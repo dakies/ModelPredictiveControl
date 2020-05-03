@@ -17,14 +17,15 @@ end
 % compute control action
 %Lec7 Slide19
 % u = u_sp -K(x-x_sp), so that u = u_sp when x = x_sp (kept in equilibrium)
- k_lqr = dlqr(param.A, param.B, param.Q, param.R,0); %definitiv Minus K - kommt von der Dokumentation 
+ 
  x = T - param.T_sp; %T_sp muss abgezogen werden
- u = -k_lqr * x;
+ u = -param.k * x;
  p = u + param.p_sp; %F�gen unseren Steady State point hinzu
 end
 
 function param = init()
 param = compute_controller_base_parameters;
 % add additional parameters if necessary, e.g.
-% param.F = ...,
+[k_lqr, ~, ~] = dlqr(param.A, param.B, param.Q, param.R); %definitiv Minus K - kommt von der Dokumentation 
+param.k = k_lqr;
 end
