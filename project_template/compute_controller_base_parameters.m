@@ -41,18 +41,18 @@ function param = compute_controller_base_parameters
     
     %% (3) set point computation
     T_sp = xu(1:3);
-    p_sp = [-1927.5;-976.5]; %xu(4:5);
+    p_sp = xu(4:5); %[-1927.5;-976.5];
     
     %% (4) system constraints
     Pcons = truck.InputConstraints;
     Tcons = truck.StateConstraints;
     
     %% (4) constraints for delta formulation
-    Gu = [1 0; -1 0; 1 0; -1 0];
+    Gu = [1 0; -1 0; 0 1; 0 -1];
     Ucons = [Pcons(1,2); -Pcons(1,1); Pcons(2,2); -Pcons(2,1)] - Gu*p_sp;
     
     Gx = [1 0 0; 0 1 0; 0 -1 0];
-    Xcons = [Tcons(1,2); Tcons(2,2); -Tcons(2,1);] - Gx * T_sp;
+    Xcons = [Tcons(1,2); Tcons(2,2); -Tcons(2,1);] - Gx * T_sp; %Check Constraints
     
     %% (5) LQR cost function
     Q = diag([400; 400; 0]);
