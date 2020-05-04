@@ -19,4 +19,7 @@ T0_1 = dev + [-21; 0.3; 7.32];
 % % norm(T_sp-t_30)<0.2*norm([3;1;0])
 
 %T7
-[T, p] = simulate_truck(T0_1, @controller_mpc_1, scen1);
+% [T, p] = simulate_truck(T0_1, @controller_mpc_1, scen1);
+
+%T11
+[T, p] = simulate_truck(T0_1, @controller_mpc_2, scen1);

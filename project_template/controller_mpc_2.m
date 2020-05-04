@@ -15,11 +15,12 @@ if isempty(param)
 end
 
 %% evaluate control action by solving MPC problem, e.g.
-% [u_mpc,errorcode] = yalmip_optimizer(...);
-% if (errorcode ~= 0)
-%       warning('MPC infeasible');
-% end
-% p = ...;
+Tin = T -param.T_sp;
+[u_mpc,errorcode] = yalmip_optimizer(Tin);
+if (errorcode ~= 0)
+      warning('MPC infeasible');
+end
+p = u_mpc{1}+param.p_sp;
 end
 
 function [param, yalmip_optimizer] = init()
@@ -29,22 +30,44 @@ function [param, yalmip_optimizer] = init()
 param = compute_controller_base_parameters; % get basic controller parameters
 
 %% implement your MPC using Yalmip here, e.g.
-% N = 30;
-% nx = size(param.A,1);
-% nu = size(param.B,2);
-%
-% U = sdpvar(repmat(nu,1,N-1),repmat(1,1,N-1),'full');
-% X = sdpvar(repmat(nx,1,N),repmat(1,1,N),'full');
-%
-% objective = 0;
-% constraints = [...];
-% for k = 1:N-1
-%   constraints = [constraints, ...];
-%   objective = objective + ... ;
-% end
-% objective = objective + ... ;
-%
-% ops = sdpsettings('verbose',0,'solver','quadprog');
-% fprintf('JMPC_dummy = %f',value(objective));
-% yalmip_optimizer = optimizer(constraints,objective,ops,... , ... );
+%MPC data
+N = 30;
+Q = param.Q;
+R = param.R;
+
+%Model data
+A = param.A;
+B = param.B;
+
+nx = size(param.A,1);
+nu = size(param.B,2);
+
+%Initial State
+dev = [3; 1; 0];
+T0_1 = dev + [-21; 0.3; 7.32];
+x0 =[];
+
+%x:=delta_x, u:=delta_u
+u = sdpvar(repmat(nu,1,N-1), repmat(1,1,N-1), 'full');
+x = sdpvar(repmat(nx,1,N), repmat(1,1,N), 'full');
+
+objective = 0;
+Gu = [1 0; -1 0; 1 0; -1 0];
+Gx = [1 0 0; 0 1 0; 0 -1 0];
+constraints =[];
+for k = 1:N-1
+  constraints = [constraints,  Gu*u{k} <= param.Ucons];
+  constraints = [constraints,  Gx*x{k} <= param.Xcons];
+  constraints = [constraints, x{k+1} == A*x{k}+B*u{k}];
+  objective = objective + x{k}'*Q*x{k} + u{k}'*R*u{k};
+end
+
+%Timestep N
+objective = objective + x{k}'*Q*x{N};
+constraints = [constraints, Gx*x{N} <= param.Xcons];
+constraints = [constraints, x{N} == [0; 0; 0]];
+
+ops = sdpsettings('verbose', 0, 'solver', 'quadprog');
+fprintf('JMPC_dummy = %f', value(objective));
+yalmip_optimizer = optimizer(constraints, objective, ops, x{1,1}, {u{1,1},objective});
 end
