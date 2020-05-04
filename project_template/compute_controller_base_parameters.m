@@ -19,8 +19,8 @@ function param = compute_controller_base_parameters
     %Exact discretisation
     A = expm(A_cont*Ts);
     B = A_cont\(A-eye(size(A_cont)))*B_cont;
-    B_d = Ts*B_d_cont;
-    %B_d = A_cont\(A-eye(size(A_cont)))*B_d_cont;
+%     B_d = Ts*B_d_cont;
+    B_d = A_cont\(A-eye(size(A_cont)))*B_d_cont;
     
     %Check for same results
 %     cont = ss(A_cont,B_cont,truck.C_ref,0);
