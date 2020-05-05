@@ -29,14 +29,14 @@ function [A_x, b_x] = compute_X_LQR
     
     
     %Constrains1
-    Xcons = param.Tcons - [param.T_sp param.T_sp];
-    Ucons = param.Pcons - [param.p_sp param.p_sp];
-    poly = Polyhedron('A', [eye(3); -eye(3); k_lqr; -k_lqr], 'b', [Xcons(:,2); -Xcons(:,1); Ucons(:,2); -Ucons(:,1)]);
+%     Xcons = param.Tcons - [param.T_sp param.T_sp];
+%     Ucons = param.Pcons - [param.p_sp param.p_sp];
+%     poly = Polyhedron('A', [eye(3); -eye(3); k_lqr; -k_lqr], 'b', [Xcons(:,2); -Xcons(:,1); Ucons(:,2); -Ucons(:,1)]);
 
 %     %Constrains2
-%     Gx = [1 0 0; 0 1 0; 0 -1 0];
-%     Gu = [1 0; -1 0; 0 1; 0 -1];
-%     poly = Polyhedron('A', [Gx; Gu*k_lqr], 'b', [param.Xcons;param.Ucons]);
+    Gx = [1 0 0; 0 1 0; 0 -1 0];
+    Gu = [1 0; -1 0; 0 1; 0 -1];
+    poly = Polyhedron('A', [Gx; Gu*k_lqr], 'b', [param.Xcons;param.Ucons]);
 
     system.x.with('setConstraint');
     system.x.setConstraint = poly;

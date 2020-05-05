@@ -15,7 +15,7 @@ if isempty(param)
 end
 
 %% evaluate control action by solving MPC problem, e.g.
-Tin = T -param.T_sp;
+Tin = T - param.T_sp;
 [u_mpc,errorcode] = yalmip_optimizer(Tin);
 if (errorcode ~= 0)
       warning('MPC infeasible');
