@@ -26,16 +26,15 @@ function [A_x, b_x] = compute_X_LQR
     B = param.B;
     system = LTISystem('A', A+B*k_lqr);
     
-    
+    Gx = [1 0 0; 0 1 0; 0 -1 0];
+    Gu = [1 0; -1 0; 0 1; 0 -1];
     
     %Constrains1
     Xcons = param.Tcons - [param.T_sp param.T_sp];
     Ucons = param.Pcons - [param.p_sp param.p_sp];
-    poly = Polyhedron('A', [eye(3); -eye(3); k_lqr; -k_lqr], 'b', [Xcons(:,2); -Xcons(:,1); Ucons(:,2); -Ucons(:,1)]);
+    poly = Polyhedron('A', [eye(3); -eye(3); k_lqr; -k_lqr], 'b', [Xcons(:,2); Xcons(:,1); Ucons(:,2); Ucons(:,1)]);
 
 %     %Constrains2
-%     Gx = [1 0 0; 0 1 0; 0 -1 0];
-%     Gu = [1 0; -1 0; 0 1; 0 -1];
 %     poly = Polyhedron('A', [Gx; Gu*k_lqr], 'b', [param.Xcons;param.Ucons]);
 
     system.x.with('setConstraint');
@@ -46,7 +45,7 @@ function [A_x, b_x] = compute_X_LQR
     title("Contraints Polytope")
     
     %Calculate Invariant Set
-    Set = system.invariantSet()
+    Set = system.invariantSet('maxIterations', 150)
     figure(2)
     Set.plot()
     

@@ -59,10 +59,7 @@ function param = compute_controller_base_parameters
     R = diag([0.007, 0.007]);
     
     %% (6) Augumented System
-%     A_aug = [A-eye(size(A)) B_d;...
-%         zeros(size(A)) eye(size(A))];
-%     B_aug = [B; zeros(size(A))];
-    
+    A_aug = [A-eye(size(A))]
     
     %% put everything together
     param.A = A;
