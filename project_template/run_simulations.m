@@ -3,7 +3,9 @@ clear all
 close all
 addpath(genpath(cd));
 load('system/parameters_scenarios.mat');
-
+%% Todo
+% Calculate If
+% Add final cost for all MPC
 %% E.g. execute simulation with LQR
 % clear persisten variables of function controller_lqr
 clear controller_lqr; 
@@ -22,7 +24,7 @@ T0_3 = [12; 12; 12];
 % %T7
 % % % execute simulation starting from T0_1 using lqr controller with scenario 1
 % [T, p] = simulate_truck(T0_2, @controller_lqr, scen1);
-% 
+%
 % %T9
 % [T, p] = simulate_truck(T0_1, @controller_mpc_1, scen1);
 % 

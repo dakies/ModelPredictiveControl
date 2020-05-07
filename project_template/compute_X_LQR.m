@@ -6,18 +6,7 @@
 function [A_x, b_x] = compute_X_LQR
     % get basic controller parameters
     param = compute_controller_base_parameters;
-    %% Here you need to implement the X_LQR computation and assign the result.
-
-%     invariant_set_lqr.plot()
-%     sgtitle('Set X_LQR');
-    %Problem: Konvergiert immernoch nicht
-    %Ideen: Teilweise Werte für delta_x und teilweise für x
-    
-%     system.x.min = [-Inf; param.Xcons(3); -Inf];
-%     system.x.max = [param.Xcons(1); param.Xcons(2); Inf];
-%     system.u.min = [param.Ucons(2); param.Ucons(4)];
-%     system.u.max = [param.Ucons(1); param.Ucons(3)];
-%   
+    %% Here you need to implement the X_LQR computation and assign the result.  
 % Controller
     k_lqr = -dlqr(param.A, param.B, param.Q, param.R);
    
@@ -46,7 +35,7 @@ function [A_x, b_x] = compute_X_LQR
     title("Contraints Polytope")
     
     %Calculate Invariant Set
-    Set = system.invariantSet()
+    Set = system.invariantSet();
     figure(2)
     Set.plot()
     
