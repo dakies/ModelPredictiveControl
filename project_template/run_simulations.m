@@ -11,7 +11,10 @@ clear controller_lqr;
 dev = [3; 1; 0];
 T0_1 = dev + [-21; 0.3; 7.32];
 % execute simulation starting from T0_1 using lqr controller with scenario 1
-[T, p] = simulate_truck(T0_1, @controller_lqr, scen1);
-% Controller works with constraints. Norm constraint from question checked
-% t_30 = [-20.63; 0.5873; 7.477]
-% norm(T_sp-t_30)<0.2*norm([3;1;0])
+
+
+%% Exercise 7
+%[T, p] = simulate_truck(T0_1, @controller_lqr, scen1);
+
+%% Exercise 9
+[T, p] = simulate_truck(T0_1, @controller_mpc_1, scen1);
