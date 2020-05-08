@@ -58,14 +58,21 @@ function param = compute_controller_base_parameters
     Q = diag([400; 400; 0]);
     R = diag([0.007, 0.007]);
     
-    [k_lqr, P, ~] = dlqr(param.A, param.B, param.Q, param.R);
+    [k_lqr, P, ~] = dlqr(A, B, Q, R);
     param.k_lqr = k_lqr;
     param.P = P;
     %% (6) Augumented System
-%     A_aug = [A-eye(size(A)) B_d;...
-%         zeros(size(A)) eye(size(A))];
-%     B_aug = [B; zeros(size(A))];
+    param.A_aug = [A-eye(size(A)) B_d;...
+        zeros(size(A)) eye(size(A))];
+    param.B_aug = [B; zeros(size(A,1), size(B,2))];
+    param.C_aug = [eye(3) zeros(3,3)]; %Y=[x1; x2; x3]
+    param.L = [eye(3); -0.1*eye(3)];
     
+    %Require stable error dynamics. Lec 7 Slide 28
+    ev = eig(param.A_aug + param.L * param.C_aug);
+    for i = 1:length(ev)
+        assert(ev(i) <= 1)
+    end
     
     %% put everything together
     param.A = A;

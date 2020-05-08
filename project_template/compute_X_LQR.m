@@ -30,14 +30,14 @@ function [A_x, b_x] = compute_X_LQR
     system.x.with('setConstraint');
     system.x.setConstraint = poly;
 
-    figure(1)
-    poly.plot()
-    title("Contraints Polytope")
+    %figure(1)
+    %poly.plot()
+    %title("Contraints Polytope")
     
     %Calculate Invariant Set
     Set = system.invariantSet();
-    figure(2)
-    Set.plot()
+    %figure(2)
+    %Set.plot()
     
     A_x = Set.A;
     b_x = Set.b;

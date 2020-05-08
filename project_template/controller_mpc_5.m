@@ -37,8 +37,8 @@ R = param.R;
 [Ax,bx] = compute_X_LQR;
 
 %Model data
-A = param.A;
-B = param.B;
+A = param.A_aug;
+B = param.B_aug;
 
 %Number of states
 nx = size(param.A,1);
@@ -49,8 +49,8 @@ Gu = [1 0; -1 0; 1 0; -1 0];
 Gx = [1 0 0; 0 1 0; 0 -1 0];
 
 %x:=delta_x, u:=delta_u
-u = sdpvar(repmat(nu,1,N-1), ones(1,N-1), 'full');
-x = sdpvar(repmat(nx,1,N), ones(1,N), 'full');
+u = sdpvar(repmat(nu, 1, N-1), ones(1, N-1), 'full');
+x = sdpvar(repmat(nx + 2, 1, N), ones(1, N), 'full');
 
 %Init
 objective = 0;

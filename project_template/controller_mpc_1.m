@@ -62,7 +62,7 @@ for k = 1:N-1
 end
 
 %Timestep N
-%Terminal cos.t from DARE
+%Terminal cost from DARE. Cost to go at x: J = xPx
 objective = objective + x{N}'*param.P*x{N};
 constraints = [constraints, Gx*x{N} <= param.Xcons];
 
