@@ -35,21 +35,25 @@ N = 30;
 Q = param.Q;
 R = param.R;
 [Ax,bx] = compute_X_LQR;
+
 %Model data
 A = param.A;
 B = param.B;
 
+%Number of states
 nx = size(param.A,1);
 nu = size(param.B,2);
 
+%State -> constraints
+Gu = [1 0; -1 0; 1 0; -1 0];
+Gx = [1 0 0; 0 1 0; 0 -1 0];
 
 %x:=delta_x, u:=delta_u
 u = sdpvar(repmat(nu,1,N-1), ones(1,N-1), 'full');
 x = sdpvar(repmat(nx,1,N), ones(1,N), 'full');
 
+%Init
 objective = 0;
-Gu = [1 0; -1 0; 1 0; -1 0];
-Gx = [1 0 0; 0 1 0; 0 -1 0];
 constraints =[];
 for k = 1:N-1
   constraints = [constraints,  Gu*u{k} <= param.Ucons];
@@ -59,7 +63,7 @@ for k = 1:N-1
 end
 
 %Timestep N
-objective = objective + x{k}'*Q*x{N};
+objective = objective + x{N}'*Q*x{N};
 constraints = [constraints, Gx*x{N} <= param.Xcons];
 constraints = [constraints, Ax*x{N} <= bx];
 

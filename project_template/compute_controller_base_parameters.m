@@ -58,6 +58,9 @@ function param = compute_controller_base_parameters
     Q = diag([400; 400; 0]);
     R = diag([0.007, 0.007]);
     
+    [k_lqr, P, ~] = dlqr(param.A, param.B, param.Q, param.R);
+    param.k_lqr = k_lqr;
+    param.P = P;
     %% (6) Augumented System
 %     A_aug = [A-eye(size(A)) B_d;...
 %         zeros(size(A)) eye(size(A))];

@@ -39,21 +39,20 @@ R = param.R;
 A = param.A;
 B = param.B;
 
+%Number of states/inputs
 nx = size(param.A,1);
 nu = size(param.B,2);
 
-%Initial State
-dev = [3; 1; 0];
-T0_1 = dev + [-21; 0.3; 7.32];
-x0 =[];
+%State -> constraints
+Gu = [1 0; -1 0; 1 0; -1 0];
+Gx = [1 0 0; 0 1 0; 0 -1 0];
 
 %x:=delta_x, u:=delta_u
 u = sdpvar(repmat(nu,1,N-1), repmat(1,1,N-1), 'full');
 x = sdpvar(repmat(nx,1,N), repmat(1,1,N), 'full');
 
+%Init
 objective = 0;
-Gu = [1 0; -1 0; 1 0; -1 0];
-Gx = [1 0 0; 0 1 0; 0 -1 0];
 constraints =[];
 for k = 1:N-1
   constraints = [constraints,  Gu*u{k} <= param.Ucons];
@@ -63,7 +62,8 @@ for k = 1:N-1
 end
 
 %Timestep N
-objective = objective + x{k}'*Q*x{N};
+%Terminal cos.t from DARE
+objective = objective + x{N}'*param.P*x{N};
 constraints = [constraints, Gx*x{N} <= param.Xcons];
 
 ops = sdpsettings('verbose', 0, 'solver', 'quadprog');

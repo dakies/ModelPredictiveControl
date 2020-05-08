@@ -48,17 +48,17 @@ nu = size(param.B,2);
 S=10^7;
 v = 10^8;
 
-%State -> constraints
+%Con
 Gu = [1 0; -1 0; 1 0; -1 0];
 Gx = [1 0 0; 0 1 0; 0 -1 0];
 
 %x:=delta_x, u:=delta_u
 u = sdpvar(repmat(nu,1,N-1), ones(1,N-1), 'full');
 x = sdpvar(repmat(nx,1,N), ones(1,N), 'full');
-Eps = sdpvar(repmat(size(Gx, 1), 1, N),ones(1,N),'full');
+Eps = sdpvar(repmat(nx,1,N),ones(1,N),'full');
 
-%Init
 objective = 0;
+
 constraints =[];
 for k = 1:N-1
   %Input
