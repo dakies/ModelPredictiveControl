@@ -17,9 +17,7 @@ if isempty(param)
     x_hat = T;
     d_hat = param.d;
 end
-
-%% SP point computation
-%Has to be recalculted due to varying disturbance
+%% Estimator
 %Lec7 Slide30
 tempor = [param.A-eye(size(param.A)) param.B;...
 param.C_ref zeros(2,2)];
@@ -28,6 +26,8 @@ param.C_ref zeros(2,2)];
 assert(det(tempor) ~= 0);
 
 xu = tempor\[-param.B_d*d_hat; param.b_ref]; 
+
+%% (3) set point computation
 T_sp = xu(1:3);
 p_sp = xu(4:5);
 x_aug = [x_hat; d_hat];
@@ -37,11 +37,9 @@ x_aug = [x_hat; d_hat];
 if (errorcode ~= 0)
       warning('MPC infeasible');
 end
-
 p = u_mpc{1};
 
-%% Estimator
-est = param.A_aug*x_aug+param.B_aug*p+param.L*(T-param.C_aug*x_aug);
+est = param.A_aug*[xx;dhat]+param.B_aug*p+param.L*(T-param.C_aug*[xx;dhat]);
 x_hat = est(1:3);
 d_hat = est(4:6);
 end

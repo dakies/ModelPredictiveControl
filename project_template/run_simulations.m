@@ -51,7 +51,7 @@ T0_3 = [12; 12; 12];
 % % T18
 % % Todo: Choose infinite horizon cost so that the origin is an asymptotically
 % % stable equilibrium point for the resulting closed-loop system ???
-simulate_truck(T0_3, @controller_mpc_4, scen1)
+% simulate_truck(T0_3, @controller_mpc_4, scen1)
 % 
 % % T19
 % % Todo: Choose infinite horizon cost so that the origin is an asymptotically
@@ -59,4 +59,4 @@ simulate_truck(T0_3, @controller_mpc_4, scen1)
 % simulate_truck(T0_2, @controller_mpc_3, scen1)
 % 
 % % T22
-% simulate_truck(T0_1, controller_mpc_5, scen2)
+simulate_truck(T0_1, @controller_mpc_5, scen2)

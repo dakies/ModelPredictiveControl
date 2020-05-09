@@ -67,7 +67,10 @@ function param = compute_controller_base_parameters
     param.B_aug = [B; zeros(size(A,1), size(B,2))];
     param.C_aug = [eye(3) zeros(3,3)]; %Y=[x1; x2; x3]
     param.L = [eye(3); -0.1*eye(3)];
-    
+    param.d = d;
+    param.C_ref = truck.C_ref;
+    param.B_d = B_d;
+    param.b_ref = truck.b_ref;
     %Require stable error dynamics. Lec 7 Slide 28
     ev = eig(param.A_aug + param.L * param.C_aug);
     for i = 1:length(ev)
