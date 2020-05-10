@@ -34,6 +34,7 @@ param = compute_controller_base_parameters; % get basic controller parameters
 N = 30;
 Q = param.Q;
 R = param.R;
+S = diag([1; 1; 0]);
 [Ax,bx] = compute_X_LQR;
 %Model data
 A = param.A;
@@ -46,6 +47,7 @@ nu = size(param.B,2);
 %x:=delta_x, u:=delta_u
 u = sdpvar(repmat(nu,1,N-1), ones(1,N-1), 'full');
 x = sdpvar(repmat(nx,1,N), ones(1,N), 'full');
+epsilon = sdpvar(repmat(nx,1,N), ones(1,N), 'full');
 
 objective = 0;
 Gu = [1 0; -1 0; 1 0; -1 0];
@@ -53,14 +55,14 @@ Gx = [1 0 0; 0 1 0; 0 -1 0];
 constraints =[];
 for k = 1:N-1
   constraints = [constraints,  Gu*u{k} <= param.Ucons];
-  constraints = [constraints,  Gx*x{k} <= param.Xcons];
+  constraints = [constraints,  Gx*x{k} <= param.Xcons + Gx*epsilon{k}];
   constraints = [constraints, x{k+1} == A*x{k}+B*u{k}];
-  objective = objective + x{k}'*Q*x{k} + u{k}'*R*u{k};
+  objective = objective + x{k}'*Q*x{k} + u{k}'*R*u{k} + epsilon{k}'*S*epsilon{k};
 end
 
 %Timestep N - terminal cost
-objective = objective + x{k}'*Q*x{N};
-constraints = [constraints, Gx*x{N} <= param.Xcons];
+objective = objective + x{k}'*Q*x{N} + epsilon{N}'*S*epsilon{N};
+constraints = [constraints, Gx*x{N} <= param.Xcons + Gx*epsilon{k}];
 constraints = [constraints, Ax*x{N} <= bx];
 
 ops = sdpsettings('verbose', 0, 'solver', 'quadprog');

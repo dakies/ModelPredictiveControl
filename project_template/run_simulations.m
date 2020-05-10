@@ -33,3 +33,6 @@ T0_3 = [12; 12; 12];
 % simulate_truck(T0_1, @controller_mpc_3, scen1)
 % simulate_truck(T0_2, @controller_mpc_3, scen1)
 
+% %T18
+  [T, p] = simulate_truck(T0_3, @controller_mpc_4, scen1);
+
