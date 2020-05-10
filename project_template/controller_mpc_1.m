@@ -67,6 +67,6 @@ objective = objective + x{N}'*param.P*x{N};
 constraints = [constraints, Gx*x{N} <= param.Xcons];
 
 ops = sdpsettings('verbose', 0, 'solver', 'quadprog');
-fprintf('JMPC_dummy = %f', value(objective));
-yalmip_optimizer = optimizer(constraints, objective, ops, x{1,1}, {u{1,1},objective});
+% fprintf('JMPC_dummy = %f', value(objective));
+yalmip_optimizer = optimizer(constraints, objective, ops, x{1,1}, {u{1,1}, objective});
 end

@@ -45,8 +45,8 @@ nx = size(param.A,1);
 nu = size(param.B,2);
 
 %Soft constraint penelization
-S=10^7;
-v = 10^8;
+S = 10^2;
+v = 10^2;
 
 %State -> constraints
 Gu = [1 0; -1 0; 1 0; -1 0];
