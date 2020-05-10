@@ -53,7 +53,6 @@ function param = compute_controller_base_parameters
     
     Gx = [1 0 0; 0 1 0; 0 -1 0];
     Xcons = [Tcons(1,2); Tcons(2,2); -Tcons(2,1);] - Gx * T_sp;
-    
     %% (5) LQR cost function
     Q = diag([400; 400; 0]);
     R = diag([0.007, 0.007]);
