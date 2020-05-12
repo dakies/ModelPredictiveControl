@@ -19,8 +19,8 @@ T0_3 = [12; 12; 12];
 % [T, p] = simulate_truck(T0_1, @controller_lqr, scen1);
 % sgtitle(strcat('controller_lqr scen1 Temp=', num2str(T0_1)))
 % % Controller works with constraints. Norm constraint from question checked
-% % t_30 = [-20.64; 0.5786; 7.475]
-% % norm(T_sp-t_30)<0.2*norm([3;1;0])
+% param = compute_controller_base_parameters
+% assert(norm(param.T_sp-T(31))<0.2*norm([3;1;0]))
 
 % %T7
 % % % % execute simulation starting from T0_1 using lqr controller with scenario 1
