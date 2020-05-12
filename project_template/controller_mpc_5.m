@@ -9,42 +9,41 @@ function p = controller_mpc_5(T)
 % controller variables
 persistent param yalmip_optimizer d_hat x_hat
 
+
+
 % initialize controller, if not done already
 if isempty(param)
+    % The disturbance has to be initialised as well
     [param, yalmip_optimizer] = init();
-    
-    %Initial state estimate
-    x_hat = T;
+    % initialise the current state estimate to be the measured state
     d_hat = param.d;
+    x_hat = T;    
 end
 
-%% SP point computation
-%Has to be recalculted due to varying disturbance
-%Lec7 Slide30
-tempor = [param.A-eye(size(param.A)) param.B;...
-param.C_ref zeros(2,2)];
+% Get the steady state, using the equations from the lecture
+steady_state = [param.A-eye(3),param.B;[1 0 0;0 1 0]*eye(3),zeros(2,2)]\[-param.B_d*d_hat;param.b_ref];
+xs = steady_state(1:3);
+us = steady_state(4:5);
 
-%Check for full Rank
-assert(det(tempor) ~= 0);
-
-xu = tempor\[-param.B_d*d_hat; param.b_ref]; 
-T_sp = xu(1:3);
-p_sp = xu(4:5);
-x_aug = [x_hat; d_hat];
-
+% Define the input to the optimizer (current state and disturbance
+% estimates)
+x_aug = [x_hat;d_hat];
 %% evaluate control action by solving MPC problem, e.g.
-[u_mpc,errorcode] = yalmip_optimizer(x_aug, T_sp, p_sp);
+[u_mpc,errorcode] = yalmip_optimizer(x_aug,xs,us);
 if (errorcode ~= 0)
       warning('MPC infeasible');
 end
-
+%Not in x_delta anymore
 p = u_mpc{1};
 
-%% Estimator
-est = param.A_aug*x_aug+param.B_aug*p+param.L*(T-param.C_aug*x_aug);
-x_hat = est(1:3);
-d_hat = est(4:6);
+% Update the estimated state and input
+estimates = param.A_aug*x_aug + param.B_aug*p + param.L*(T-param.C_aug*x_aug);
+x_hat = estimates(1:3);
+d_hat = estimates(4:6);
+
 end
+% Get the updated state and disturbance estimates
+
 
 function [param, yalmip_optimizer] = init()
 % initializes the controller on first call and returns parameters and
@@ -53,48 +52,33 @@ function [param, yalmip_optimizer] = init()
 param = compute_controller_base_parameters; % get basic controller parameters
 
 %% implement your MPC using Yalmip here, e.g.
-%MPC data
+
 N = 30;
-Q = param.Q;
-R = param.R;
-[Ax,bx] = compute_X_LQR;
-
-%Model data
-A = param.A_aug;
-B = param.B_aug;
-
-%Number of states
 nx = size(param.A_aug,1);
 nu = size(param.B_aug,2);
+[Axn,bxn]=compute_X_LQR;
 
-%State -> constraints
-Gu = [1 0; -1 0; 1 0; -1 0];
-Gx = [1 0 0; 0 1 0; 0 -1 0];
+U = sdpvar(repmat(nu,1,N-1),ones(1,N-1),'full');
+X = sdpvar(repmat(nx,1,N),ones(1,N),'full');
 
-%x:=delta_x, u:=delta_u
-u = sdpvar(repmat(nu, 1, N-1), ones(1, N-1), 'full');
-x = sdpvar(repmat(nx, 1, N), ones(1, N), 'full'); %x=[x;d_hat]
+xs = sdpvar(nx/2,1,'full');
+us = sdpvar(nu,1,'full');
 
-%Steady states. Recalculation required for variang disturbance estimate
-x_s = sdpvar(nx/2,1,'full');
-u_s = sdpvar(nu,1,'full');
+objective = (X{:,1}(1:3,:)-xs)'*param.Q*(X{:,1}(1:3,:)-xs)+(U{:,1}-us)'*param.R*(U{:,1}-us);
+constraints = [param.Pcons(:,1)<=U{:,1}<=param.Pcons(:,2)];
+for k = 2:N-1
+  % State dynamic constraint, 
+  constraints = [constraints, X{:,k}==param.A_aug*X{:,k-1}+param.B_aug*U{:,k-1}];
+  % State constraints & input constraints
+  constraints = [constraints,param.Pcons(:,1)<=U{:,k}<=param.Pcons(:,2),param.Tcons(:,1)<=X{:,k}(1:3)<=param.Tcons(:,2)]; 
+  objective = objective + (X{:,k}(1:3,:)-xs)'*param.Q*(X{:,k}(1:3,:)-xs)+(U{:,k}-us)'*param.R*(U{:,k}-us);
 
-%Init
-objective = 0;
-constraints =[];
-for k = 1:N-1
-  constraints = [constraints,  Gu*u{k} <= param.Ucons];
-  constraints = [constraints,  Gx*x{k}(1:3) <= param.Xcons];
-  constraints = [constraints, x{k+1} == A*x{k} + B*u{k}];
-  objective = objective + (x{k}(1:3)-x_s)'*Q*(x{k}(1:3)-x_s) + (u{k}-u_s)'*R*(u{k}-u_s);
 end
+constraints = [constraints, X{:,N}==param.A_aug*X{:,N-1}+param.B_aug*U{:,N-1}];
+constraints = [constraints, Axn*(X{:,N}(1:3,:)-xs)<=bxn];
+objective = objective + (X{:,N}(1:3,:)-xs)'*param.P*(X{:,N}(1:3,:)-xs) ;
 
-%Timestep N
-objective = objective + (x{N}(1:3)-x_s)'*Q*(x{N}(1:3)-x_s);
-constraints = [constraints, Gx*x{N}(1:3) <= param.Xcons];
-constraints = [constraints, Ax*x{N}(1:3) <= bx];
-
-ops = sdpsettings('verbose', 0, 'solver', 'quadprog');
-fprintf('JMPC_dummy = %f', value(objective));
-yalmip_optimizer = optimizer(constraints, objective, ops, {x{1,1}; x_s; u_s}, {u{1,1},objective});
+ops = sdpsettings('verbose',0,'solver','quadprog');
+fprintf('JMPC_dummy = %f',value(objective));
+yalmip_optimizer = optimizer(constraints,objective,ops,{X{1,1};xs;us},{U{1,1},objective});
 end

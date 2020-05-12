@@ -64,7 +64,7 @@ for k = 1:N-1
   %Input
   constraints = [constraints,  Gu*u{k} <= param.Ucons];
   % State
-  constraints = [constraints,  Gx*x{k} <= param.Xcons];
+  constraints = [constraints,  Gx*x{k} <= param.Xcons + Eps{k}];
   %System
   constraints = [constraints, x{k+1} == A*x{k}+B*u{k}, 0 <= Eps{k}];
   %Cost

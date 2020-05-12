@@ -32,6 +32,8 @@ T0_3 = [12; 12; 12];
 % [T, p] = simulate_truck(T0_2, @controller_mpc_1, scen1);
 % sgtitle(strcat('controller_mpc_1 scen1 Temp=', num2str(T0_1)))
 
+% [T, p] = simulate_truck(T0_1, @controller_mpc_1_forces, scen1);
+
 % 
 % % %T11
 %  [T, p] = simulate_truck(T0_1, @controller_mpc_2, scen1);
