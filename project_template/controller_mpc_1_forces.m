@@ -20,7 +20,7 @@ Tin = T - param.T_sp;
 if (errorcode ~= 0)
       warning('MPC infeasible');
 end
-p = u_mpc{1}+param.p_sp;
+p = u_mpc + param.p_sp;
 end
 
 function [param, forces_optimizer] = init()
@@ -49,8 +49,8 @@ Gx = [1 0 0; 0 1 0; 0 -1 0];
 
 %x:=delta_x, u:=delta_u
 
-u = sdpvar(repmat(nu,1,N-1), repmat(1,1,N-1), 'full');
-x = sdpvar(repmat(nx,1,N), repmat(1,1,N), 'full');
+u = sdpvar(repmat(nu,1,N-1), ones(1,N-1), 'full');
+x = sdpvar(repmat(nx,1,N), ones(1,N), 'full');
 
 %Init
 objective = 0;
@@ -69,5 +69,5 @@ constraints = [constraints, Gx*x{N} <= param.Xcons];
 
 fprintf('JMPC_dummy = %f',value(objective));
 options=getOptions('simpleMPC_solver');
-forces_optimizer = optimizerFORCES(constraints, objective, options, x{1,1}, u{1,1})
+forces_optimizer = optimizerFORCES(constraints, objective, options, x{1,1}, u{1,1});
 end

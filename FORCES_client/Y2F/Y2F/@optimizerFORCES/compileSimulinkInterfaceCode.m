@@ -28,11 +28,29 @@ else
     isMinGW = false;
 end
 
-% copy the O-files of all solvers into /interface
-% we'll delete them later, but this makes compilation easier
-for i=1:self.numSolvers
-    if( ~ispc )
-        copyfile(sprintf('%s/obj/%s.o',solverName,self.codeoptions{i}.name), sprintf('%s/interface',solverName), 'f');
+% check the object/library files of all solvers
+if( ~ispc )
+    missingObjs = false;
+    missingLibs = false;
+    useLibraryFiles = true;
+    % check whether libraries and object files exist
+    for i=1:self.numSolvers
+        objName = sprintf('%s/obj/%s.o',solverName,self.codeoptions{i}.name); 
+        libName = sprintf('%s/lib/lib%s.a',solverName,self.codeoptions{i}.name);
+        if(~exist(objName, 'file'))
+            missingObjs = true;
+        end
+        if(~exist(libName, 'file'))
+            missingLibs = true;
+        end
+    end
+    if(missingLibs && missingObjs)
+        error('Cannot find object files or libraries to compile');
+    end
+    if(~missingLibs)
+        useLibraryFiles = true;
+    else
+        useLibraryFiles = false;
     end
 end
 
@@ -134,44 +152,53 @@ if exist( [cName '.c'], 'file' ) && exist( [simulinkName '.c'], 'file' )
             % it seems that we have been compiling with VS only,
             % so we do not add the Intel libs and use only object files
             
-            % Find all object files in obj folder
-            objFiles = dir([solverName filesep 'obj']); % struct with name and folder in different fields
-            objFiles = objFiles(~cellfun(@isempty, regexp({objFiles.name}, '\.obj$', 'start', 'once')));
-            objFiles = arrayfun(@(x) [solverName filesep 'obj' filesep x.name], ...
-                                objFiles, 'UniformOutput', false); % cell array with paths
+            % we create a cell array for mex interface, main solver and all internal solvers
+            linkFiles = cell(1,self.numSolvers + 2);
+            linkFiles{1} = [solverName, '/interface/', solverName, '.obj'];
+            linkFiles{2} = [solverName, '/interface/', solverName, '_simulinkBlock.obj'];
+            % Add all object files in obj folder
+            for i=1:self.numSolvers
+                objFile = [solverName, '/obj/', self.codeoptions{i}.name, '.obj'];
+                if exist(objFile, 'file')
+                    linkFiles{2 + i} = objFile;
+                else
+                    error(['Object file ', objFile, ' not found. Compilation aborted']);
+                end
+            end
             
             % Compile MEX interface
-            mex([solverName, '/interface/' solverName '.obj'], ...
-                [solverName, '/interface/' solverName '_simulinkBlock.obj'], ...
-                objFiles{:}, '-lIPHLPAPI.lib', legacyLibs, ...
+            mex(linkFiles{:}, '-lIPHLPAPI.lib', legacyLibs, ...
                 '-output', [outputName(2:end-1),'.',mexext],'-largeArrayDims', '-silent');
         
             % Delete unnecessary object files
             delete([solverName '/interface/*.obj']);
         end
-    elseif( ismac )
+    else % macOS or linux system
         
-        % Find all object files in interface folder
-        objFiles = dir([solverName filesep 'interface']); % struct with name and folder in different fields
-        objFiles = objFiles(~cellfun(@isempty, regexp({objFiles.name}, '\.o$', 'start', 'once')));
-        objFiles = arrayfun(@(x) [solverName filesep 'interface' filesep x.name], ...
-                            objFiles, 'UniformOutput', false); % cell array with paths
+        % we create a cell array for mex interface, main solver and all internal solvers
+        linkFiles = cell(1,self.numSolvers + 2);
+        linkFiles{1} = [solverName, '/interface/', solverName, '.o'];
+        linkFiles{2} = [solverName, '/interface/', solverName, '_simulinkBlock.o'];
+        if(useLibraryFiles)
+            % Add all library files in lib folder
+            for i=1:self.numSolvers
+                libFile = [solverName, '/lib/lib', self.codeoptions{i}.name, '.a'];
+                linkFiles{2 + i} = libFile;
+            end
+        else
+            % Add all object files in obj folder
+            for i=1:self.numSolvers
+                objFile = [solverName, '/obj/', self.codeoptions{i}.name, '.o'];
+                linkFiles{2 + i} = objFile;
+            end
+        end    
         
         % Compile MEX interface
-        mex(objFiles{:}, '-output', outputName, '-largeArrayDims', '-silent')
-        
-        % Delete unnecessary object files
-        delete([solverName '/interface/*.o']);
-    else % we're on a linux system
-        
-        % Find all object files in interface folder
-        objFiles = dir([solverName filesep 'interface']); % struct with name and folder in different fields
-        objFiles = objFiles(~cellfun(@isempty, regexp({objFiles.name}, '\.o$', 'start', 'once')));
-        objFiles = arrayfun(@(x) [solverName filesep 'interface' filesep x.name], ...
-                            objFiles, 'UniformOutput', false); % cell array with paths
-        
-        % Compile MEX interface
-        mex(objFiles{:}, '-output', outputName, '-lrt', '-largeArrayDims', '-silent') 
+        if( ismac ) % macOS system
+            mex(linkFiles{:}, '-output', outputName, '-largeArrayDims', '-silent');
+        else % linux system
+            mex(linkFiles{:}, '-output', outputName, '-lrt', '-largeArrayDims', '-silent');
+        end
         
         % Delete unnecessary object files
         delete([solverName '/interface/*.o']);

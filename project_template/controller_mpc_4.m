@@ -72,11 +72,10 @@ for k = 1:N-1
 end
 
 %Timestep N
-objective = objective + x{N}'*Q*x{N} + Eps{N}'*S*Eps{N} + v*norm(Eps{N},1);
+objective = objective + Eps{N}'*S*Eps{N} + v*norm(Eps{N},1);
 constraints = [constraints, Gx*x{N} <= param.Xcons + Eps{N}, 0 <= Eps{N}];
 constraints = [constraints, Ax*x{N} <= bx];
 
 ops = sdpsettings('verbose', 0, 'solver', 'quadprog');
-fprintf('JMPC_dummy = %f', value(objective));
 yalmip_optimizer = optimizer(constraints, objective, ops, x{1,1}, {u{1,1},objective});
 end

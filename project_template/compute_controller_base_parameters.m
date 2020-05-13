@@ -55,10 +55,10 @@ function param = compute_controller_base_parameters
     %% (5) LQR cost function
 %     Q = diag([400; 400; 0]);
 %     R = diag([0.007, 0.007]);
-%     Q = diag([1; 1.5; 1])*10000;
-%     R = diag([0.4, 0.022]);
-    Q = diag([1; 2; 1])*500;
-    R = diag([1, 1])*0.01;
+    Q = diag([1; 1.5; 1])*10000;
+    R = diag([0.4, 0.022]);
+%     Q = diag([1; 2; 1])*500;
+%     R = diag([1, 1])*0.01;
     
     [k_lqr, P, ~] = dlqr(A, B, Q, R);
     param.k_lqr = k_lqr;

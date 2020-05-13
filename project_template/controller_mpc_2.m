@@ -48,8 +48,8 @@ Gu = [1 0; -1 0; 1 0; -1 0];
 Gx = [1 0 0; 0 1 0; 0 -1 0];
 
 %x:=delta_x, u:=delta_u
-u = sdpvar(repmat(nu,1,N-1), repmat(1,1,N-1), 'full');
-x = sdpvar(repmat(nx,1,N), repmat(1,1,N), 'full');
+u = sdpvar(repmat(nu,1,N-1), ones(1,N-1), 'full');
+x = sdpvar(repmat(nx,1,N), ones(1,N), 'full');
 
 objective = 0;
 constraints =[];
@@ -67,6 +67,5 @@ constraints = [constraints, Gx*x{N} <= param.Xcons];
 constraints = [constraints, x{N} == [0; 0; 0]];
 
 ops = sdpsettings('verbose', 0, 'solver', 'quadprog');
-fprintf('JMPC_dummy = %f', value(objective));
 yalmip_optimizer = optimizer(constraints, objective, ops, x{1,1}, {u{1,1},objective});
 end

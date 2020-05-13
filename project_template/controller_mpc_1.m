@@ -20,7 +20,7 @@ Tin = T - param.T_sp;
 if (errorcode ~= 0)
       warning('MPC infeasible');
 end
-p = u_mpc{1}+param.p_sp;
+p = u_mpc{1} + param.p_sp;
 end
 
 function [param, yalmip_optimizer] = init()
@@ -48,8 +48,8 @@ Gu = [1 0; -1 0; 1 0; -1 0];
 Gx = [1 0 0; 0 1 0; 0 -1 0];
 
 %x:=delta_x, u:=delta_u
-u = sdpvar(repmat(nu,1,N-1), repmat(1,1,N-1), 'full');
-x = sdpvar(repmat(nx,1,N), repmat(1,1,N), 'full');
+u = sdpvar(repmat(nu,1,N-1), ones(1,N-1), 'full');
+x = sdpvar(repmat(nx,1,N), ones(1,N), 'full');
 
 %Init
 objective = 0;

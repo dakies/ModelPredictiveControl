@@ -81,6 +81,5 @@ constraints = [constraints, Axn*(X{:,N}(1:3,:)-xs)<=bxn];
 objective = objective + (X{:,N}(1:3,:)-xs)'*param.P*(X{:,N}(1:3,:)-xs) ;
 
 ops = sdpsettings('verbose',0,'solver','quadprog');
-fprintf('JMPC_dummy = %f',value(objective));
 yalmip_optimizer = optimizer(constraints,objective,ops,{X{1,1};xs;us},{U{1,1},objective});
 end

@@ -38,9 +38,9 @@ figure
 sgtitle('simulate truck(T0 2, @controller mpc 1, scen1)')
 figure
 
-% % [T, p] = simulate_truck(T0_1, @controller_mpc_1_forces, scen1);
-% % sgtitle('simulate truck(T0 2, @controller mpc 1 FORCES, scen1)')
-% % figure
+[T, p] = simulate_truck(T0_1, @controller_mpc_1_forces, scen1);
+sgtitle('simulate truck(T0 2, @controller mpc 1 FORCES, scen1)')
+figure
 
 
 % T11
@@ -48,39 +48,35 @@ figure
 sgtitle('simulate truck(T0 2, @controller mpc 2, scen1)')
 figure
 
-% % % T15
-% % Todo: Choose infinite horizon cost so that the origin is an asymptotically
-% % stable equilibrium point for the resulting closed-loop system ???
-simulate_truck(T0_1, @controller_mpc_3, scen1)
+% % T15
+% Todo: Choose infinite horizon cost so that the origin is an asymptotically
+% stable equilibrium point for the resulting closed-loop system ???
+simulate_truck(T0_1, @controller_mpc_3, scen1);
 sgtitle('simulate truck(T0 1, @controller mpc 3, scen1)');
 figure
 
-simulate_truck(T0_2, @controller_mpc_3, scen1)
+simulate_truck(T0_2, @controller_mpc_3, scen1);
 sgtitle('simulate truck(T0 2, @controller mpc 3, scen1)');
 figure
 
 
-% % T17
-simulate_truck(T0_3, @controller_mpc_3, scen1)
+% T17
+simulate_truck(T0_3, @controller_mpc_3, scen1);
 sgtitle('simulate truck(T0 3, @controller mpc 3, scen1)');
 figure
 
-% % T18
-% % Todo: Choose infinite horizon cost so that the origin is an asymptotically
-% % stable equilibrium point for the resulting closed-loop system ???
-simulate_truck(T0_3, @controller_mpc_4, scen1)
+% T18
+simulate_truck(T0_3, @controller_mpc_4, scen1);
 sgtitle('simulate truck(T0 3, @controller mpc 4, scen1)');
 figure
 
 
-% % T19
-% % Todo: Choose infinite horizon cost so that the origin is an asymptotically
-% % stable equilibrium point for the resulting closed-loop system ???
-simulate_truck(T0_3, @controller_mpc_4, scen1)
-sgtitle('simulate truck(T0 3, @controller mpc 4, scen1)');
+% T19
+simulate_truck(T0_2, @controller_mpc_4, scen1);
+sgtitle('simulate truck(T0 2, @controller mpc 4, scen1)');
 figure
 
-% 
+
 % % T22
-simulate_truck(T0_1, @controller_mpc_5, scen2)
+simulate_truck(T0_1, @controller_mpc_5, scen2);
 sgtitle('simulate truck(T0 1, @controller mpc 5, scen2)');

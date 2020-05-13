@@ -63,11 +63,11 @@ for k = 1:N-1
 end
 
 %Timestep N
-objective = objective + x{N}'*Q*x{N};
+%Why does it become infeasable when peanalizing the End State ????????????
+% objective = objective + x{N}'*Q*x{N};
 constraints = [constraints, Gx*x{N} <= param.Xcons];
 constraints = [constraints, Ax*x{N} <= bx];
 
 ops = sdpsettings('verbose', 0, 'solver', 'quadprog');
-fprintf('JMPC_dummy = %f', value(objective));
 yalmip_optimizer = optimizer(constraints, objective, ops, x{1,1}, {u{1,1},objective});
 end
