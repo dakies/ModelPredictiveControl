@@ -55,8 +55,10 @@ function param = compute_controller_base_parameters
     %% (5) LQR cost function
 %     Q = diag([400; 400; 0]);
 %     R = diag([0.007, 0.007]);
-Q = diag([1; 1.5; 1])*10000;
-    R = diag([0.4, 0.022]);
+%     Q = diag([1; 1.5; 1])*10000;
+%     R = diag([0.4, 0.022]);
+    Q = diag([1; 2; 1])*500;
+    R = diag([1, 1])*0.01;
     
     [k_lqr, P, ~] = dlqr(A, B, Q, R);
     param.k_lqr = k_lqr;
@@ -73,7 +75,7 @@ Q = diag([1; 1.5; 1])*10000;
     param.b_ref = truck.b_ref;
     %Require stable error dynamics. Lec 7 Slide 28. Achieved through
     %place()
-    ev = eig(param.A_aug - param.L * param.C_aug); %Das sollte iegentlich ev = eig(param.A_aug + param.L * param.C_aug); sein!!!
+    ev = eig(param.A_aug - param.L * param.C_aug); %Das sollte iegentlich ev = eig(param.A_aug + param.L * param.C_aug); sein, oder?! Anscheinend nicht, wegen place(), siehe tutorial
     for i = 1:length(ev)
         assert(ev(i) <= 1)
     end
