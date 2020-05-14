@@ -64,7 +64,7 @@ end
 
 %Timestep N
 %Why does it become infeasable when peanalizing the End State ????????????
-% objective = objective + x{N}'*Q*x{N};
+objective = objective + x{N}'*param.P*x{N};
 constraints = [constraints, Gx*x{N} <= param.Xcons];
 constraints = [constraints, Ax*x{N} <= bx];
 

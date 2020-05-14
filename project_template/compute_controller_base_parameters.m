@@ -68,7 +68,7 @@ function param = compute_controller_base_parameters
         zeros(size(A)) eye(size(A))];
     param.B_aug = [B; zeros(size(A,1), size(B,2))];
     param.C_aug = [eye(3) zeros(3,3)]; %Y=[x1; x2; x3]
-    param.L = place(param.A_aug',param.C_aug',[0.03 -0.03 0.02  -0.02 0.01 -0.01])';
+    param.L = place(param.A_aug',param.C_aug',[0.02 -0.03 0.01  -0.02 0.01 -0.01])';
     param.d = d;
     param.C_ref = truck.C_ref;
     param.B_d = B_d;

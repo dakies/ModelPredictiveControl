@@ -21,8 +21,7 @@ if isempty(param)
 end
 
 % Get the steady state, using the equations from the lecture
-steady_state = [param.A-eye(3),param.B;param.C_ref,zeros(2,2)]\[-param.B_d*d_hat;param.b_ref];
-%x_s-c_d*d_hat
+steady_state = [param.A-eye(3),param.B; param.C_ref,zeros(2,2)]\[-param.B_d*d_hat;param.b_ref];
 xs = steady_state(1:3);
 us = steady_state(4:5);
 
